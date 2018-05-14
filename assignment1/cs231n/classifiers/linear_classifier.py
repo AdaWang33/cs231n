@@ -53,7 +53,9 @@ class LinearClassifier(object):
       # Hint: Use np.random.choice to generate indices. Sampling with         #
       # replacement is faster than sampling without replacement.              #
       #########################################################################
-      pass
+      index = np.random.choice(num_train, batch_size, replace=True)
+      X_batch = X[index]
+      y_batch = y[index]
       #########################################################################
       #                       END OF YOUR CODE                                #
       #########################################################################
@@ -67,13 +69,14 @@ class LinearClassifier(object):
       # TODO:                                                                 #
       # Update the weights using the gradient and the learning rate.          #
       #########################################################################
-      pass
+      self.W -= learning_rate*grad
       #########################################################################
       #                       END OF YOUR CODE                                #
       #########################################################################
 
       if verbose and it % 100 == 0:
-        print('iteration %d / %d: loss %f' % (it, num_iters, loss))
+        #print('iteration %d / %d: loss %f' % (it, num_iters, loss))
+        pass
 
     return loss_history
 
@@ -96,7 +99,9 @@ class LinearClassifier(object):
     # TODO:                                                                   #
     # Implement this method. Store the predicted labels in y_pred.            #
     ###########################################################################
-    pass
+    y_tmp = np.dot(X,self.W) # y_tmp has the shape N*C
+    y_tmp = np.argmax(y_tmp, axis=1) # return the index of most likely class
+    y_pred = y_tmp
     ###########################################################################
     #                           END OF YOUR CODE                              #
     ###########################################################################
