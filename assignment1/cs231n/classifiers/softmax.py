@@ -1,6 +1,7 @@
 import numpy as np
 from random import shuffle
 from past.builtins import xrange
+import math
 
 def softmax_loss_naive(W, X, y, reg):
   """
@@ -23,14 +24,34 @@ def softmax_loss_naive(W, X, y, reg):
   # Initialize the loss and gradient to zero.
   loss = 0.0
   dW = np.zeros_like(W)
-
+  denoms = 0.0
+  
+  num_train = X.shape[0]
+  num_class = W.shape[1]
   #############################################################################
   # TODO: Compute the softmax loss and its gradient using explicit loops.     #
   # Store the loss in loss and the gradient in dW. If you are not careful     #
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+  y_cal = np.dot(X,W) # return shape N*C
+  y_cal -= np.max(y_cal) # ensure numerical safety
+                  
+  for i in range(num_train):
+        denoms = np.sum(np.exp(y_cal[i,:]))
+        loss_i = -1 * y_cal[i, y[i]] + math.log(denoms)
+        loss += loss_i
+        for j in range(num_class):
+            if j == y[i]:
+                dW[:, j] -= X[i]
+            dW[:, j] += (1 / denoms) * np.exp(y_cal[i, j]) * X[i]
+            
+  
+  loss /= num_train
+  loss += 0.5 * reg * np.sum(W * W)
+  
+  dW /= num_train
+  dW += reg * W
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
@@ -47,14 +68,39 @@ def softmax_loss_vectorized(W, X, y, reg):
   # Initialize the loss and gradient to zero.
   loss = 0.0
   dW = np.zeros_like(W)
+  denoms = 0.0
 
+  num_train = X.shape[0]
+  num_class = W.shape[1]
   #############################################################################
   # TODO: Compute the softmax loss and its gradient using no explicit loops.  #
   # Store the loss in loss and the gradient in dW. If you are not careful     #
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+
+  scores = X.dot(W)
+  # make largest value here zero, just for numeric stability
+  scores -=np.max(scores)
+  expscores = np.exp(scores)
+
+  denoms = expscores.sum(axis=1)
+  numers = expscores[range(num_train), y]
+  loss = -1 * np.log(numers / denoms).sum()
+
+
+  dW1 = np.dot(X.T / denoms, np.exp(scores))
+  correct_term = np.zeros(scores.shape)
+  correct_term[np.arange(num_train),y] = -1
+  dW2 = np.dot(X.T, correct_term)
+  dW = dW1 + dW2
+
+  loss /= num_train
+  loss += 0.5 * reg * np.sum(W * W)
+
+  dW /= num_train
+  dW += reg * W
+      
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
