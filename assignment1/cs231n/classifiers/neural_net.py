@@ -131,8 +131,8 @@ class TwoLayerNet(object):
     #
     # dLoss/dW2 = dLoss/dScores * dScores/dW2
     #           = dscores       * hidden_scores(with shape N*H)
-    grads['b2'] = np.sum(dscores, axis=1)
-    grads['w2'] = np.dot(scores_relu.T,dscores)
+    grads['b2'] = np.sum(dscores, axis=0)
+    grads['W2'] = np.dot(scores_relu.T,dscores)
     
     
     # dLoss/dHidden = dLoss/dScores * dScores/dHidden
@@ -150,7 +150,7 @@ class TwoLayerNet(object):
 
     # dLoss/dB1 = dLoss/dLayer1Scores * dLayer1Scores/B1
     #           = dLayer1Scores * 1
-    grads['b1'] = np.sum(dLayer1Scores, axis=1)  
+    grads['b1'] = np.sum(dLayer1Scores, axis=0)  
     # Layer1Scores = W1 * X + B1
     # dLoss/dW1 = dLoss/dLayer1Scores * dLayer1Scores/dW1
     #           = dLayer1Scores * X(with shape N*D) 
@@ -268,7 +268,7 @@ class TwoLayerNet(object):
     W2, b2 = self.params['W2'], self.params['b2']
 
     score = np.dot(np.max(np.dot(X,W1)+b1, 0),W2)+b2
-    y_pred = np.argmax(score,axis=1)
+    y_pred = np.argmax(score,axis=0)
     ###########################################################################
     #                              END OF YOUR CODE                           #
     ###########################################################################
